@@ -1,14 +1,17 @@
 from models import Category,Product
+from app import app
 def load_cagories():
     return Category.query.order_by('id').all()
 
-def load_product(cate_id = None, kw = None):
+def load_product(cate_id = None, kw = None, page = 1):
     query = Product.query
     if kw:
         query = query.filter(Product.name.contains(kw))
     if cate_id:
         query = query.filter(cate_id == Product.category_id)
-
+    page_size = app.config["PAGE_SIZE"]
+    start = (page - 1) * page_size
+    query = query.slice(start, start + page_size)
     return query.all()
     # return [{
     #     "id": 1,
@@ -60,3 +63,5 @@ def load_product(cate_id = None, kw = None):
     #     "category_id": 1
     # }
     # ]
+def count_products():
+    return Product.query.count()
